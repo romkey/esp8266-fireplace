@@ -1,17 +1,8 @@
-// this sketch waits for a push-button press, which it debounces
-// then it closes a relay for a few seconds
-// this tells our coffee bot that we've emptied the grounds bucket
-// also turn on an LED and remember the fact that we did this
-
 #include "config.h"
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
-
-#ifdef OTA_UPDATES
-#include <ESP8266HTTPUpdateServer.h>
-#endif // OTA_UPDATES
 
 #ifdef MDNS_NAME
 #include <ESP8266mDNS.h>
@@ -38,10 +29,6 @@ IFTTTWebhook ifttt(IFTTT_KEY, IFTTT_EVENT_NAME);
 #endif
 
 ESP8266WebServer server(80);
-
-#ifdef OTA_UPDATES
-ESP8266HTTPUpdateServer httpUpdater;
-#endif /* OTA_UPDATES */
 
 BootstrapWebSite ws("en");
 
@@ -182,17 +169,16 @@ void fireplaceOff() {
 void handleInfo() {
   BootstrapWebPage page = BootstrapWebPage(&ws);
   page.addHeading("Info");
-  page.addContent(String("<ul class='list-group'>" +
-                                String("<li class='list-group-item'>Uptime ") + String((millis() - startTime)/1000) + String(" seconds</li>") +
-                                String("<li class='list-group-item'>IP address ") + String(WiFi.localIP().toString()) + String("</li>") +
-                                String("<li class='list-group-item'>Hostname ") + String(WiFi.hostname()) + String("</li>") +
-                                String("<li class='list-group-item'>MAC address ") + WiFi.macAddress() + String("</li>") +
-                                String("<li class='list-group-item'>Subnet mask ") + WiFi.subnetMask().toString() + String("</li>") +
-                                String("<li class='list-group-item'>router IP ") + WiFi.gatewayIP().toString() + String("</li>") +
-                                String("<li class='list-group-item'>first DNS server ") + WiFi.dnsIP(0).toString() + String("</li>") +
-                                String("<li class='list-group-item'>SSID ") + WiFi.SSID() + String("</li>") +
-                                String("<li class='list-group-item'>RSSi ") + WiFi.RSSI() + String("</li>") +
-                                String("</ul>")));
+  page.addList(String("Uptime ") + String((millis() - startTime) / 1000) + " seconds",
+	       String("IP address ") + WiFi.localIP().toString(),
+	       String("Hostname ") + WiFi.hostname(),
+	       String("MAC address ") + WiFi.macAddress(),
+	       String("Subnet mask ") + WiFi.subnetMask().toString(),
+	       String("router IP ") + WiFi.gatewayIP().toString(),
+	       String("first DNS server ") + WiFi.dnsIP(0).toString(),
+	       String("SSID ") + WiFi.SSID(),
+	       String("RSSi ") + WiFi.RSSI());
+
   server.send(200, "text/html", page.getHTML());
 }
 
@@ -234,15 +220,15 @@ void handleStateJSON() {
 void handleESP() {
    BootstrapWebPage page = BootstrapWebPage(&ws);
    page.addHeading(String("ESP"));
-   page.addContent(String("<ul class='list-group'>") +
-                                "<li class='list-group-item'>VCC " + ESP.getVcc() + " </li>" +
-                                "<li class='list-group-item'>Free heap " + ESP.getFreeHeap() + "</li>" +
-                                "<li class='list-group-item'>Chip ID " + ESP.getChipId() + "</li>" +
-                                "<li class='list-group-item'>Flash chip ID " + ESP.getFlashChipId()  + "</li>" +
-                                "<li class='list-group-item'>Flash chip size " + ESP.getFlashChipSize()  + "</li>" +
-                                "<li class='list-group-item'>Flash chip speed " + ESP.getFlashChipSpeed()  + "</li>" +                             
-                                "<li class='list-group-item'>Sketch Size " + ESP.getSketchSize() + " </li>" +
-                                "<li class='list-group-item'>Free Sketch Space " + ESP.getFreeSketchSpace() + " </li></ul>");
+   page.addList(String("VCC ") + ESP.getVcc(),
+		String("Free heap ") + ESP.getFreeHeap(),
+		String("Chip ID ") + ESP.getChipId() ,
+		String("Flash chip ID ") + ESP.getFlashChipId(),
+		String("Flash chip size ") + ESP.getFlashChipSize(),
+		String("Flash chip speed ") + ESP.getFlashChipSpeed(),
+		String("Sketch Size ") + ESP.getSketchSize(),
+		String("Free Sketch Space ") + ESP.getFreeSketchSpace());
+
    server.send(200, "text/html", page.getHTML());
 }
 
