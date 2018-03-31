@@ -4,7 +4,9 @@ This is a simple controller for a gas fireplace with a low voltage DC wall switc
 
 The controller uses a [Wemos D1 mini Lite](https://wiki.wemos.cc/products:d1:d1_mini_lite) with a [Wemos Relay Shield](https://wiki.wemos.cc/products:d1_mini_shields:relay_shield). The Relay Shield is wired in parallel with the wall switch so that either can turn on the fireplace. Note that this means if one is on, the other switch cannot turn it off.
 
-## Compiling
+![Fireplace controller web UI](/doc/images/web-ui.png?raw=true)
+
+## Software
 
 The project should work with the Arduino IDE or Platformio.
 
@@ -20,6 +22,8 @@ git clone
 3. Connect your Wemos D1 mini Lite board to your computer using a USB cable and:
 - if you're using Platformio run `platformio run -t upload`
 - if you're using the Arduino IDE click the build and upload button
+
+## Siri
 
 ## Security Considerations
 
