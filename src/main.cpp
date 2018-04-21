@@ -21,6 +21,11 @@
 #include <IFTTTWebhook.h>
 #endif
 
+extern "C" {
+  #include "user_interface.h"
+};
+
+
 // hardware configuration
 // 4 - Wemos D1 mini lite, 5 - Sparkfun Thing
 const int ledPin = 5;      // the number of the LED pin  -- 5 for sparkfun
@@ -48,6 +53,8 @@ volatile unsigned long lastDebounceTime = 0;  // the last time the output pin wa
 unsigned long debounceDelay = 200;    // the debounce time; increase if the output flickers
 
 void handleRoot(), handleOn(), handleOff(), handleInfo(), handleESP(), handleStateJSON(), handleNotFound();
+
+ADC_MODE(ADC_VCC);
 
 void setup() {
   startTime = millis();
@@ -77,6 +84,8 @@ void setup() {
 #endif    
   }
 
+  WiFi.hostname(MDNS_NAME);
+
 #if DEBUG
   Serial.println("");
   Serial.print("Connected to ");
@@ -90,6 +99,8 @@ void setup() {
 #if DEBUG
     Serial.print("MDNS responder started: ");
     Serial.println(MDNS_NAME);
+
+    MDNS.addService("http", "tcp", 80);
 #endif
   }
 #endif
@@ -228,9 +239,18 @@ void handleStateJSON() {
 
 void handleESP() {
    BootstrapWebPage page = BootstrapWebPage(&ws);
+
+  // from https://www.espressif.com/sites/default/files/documentation/esp8266_reset_causes_and_common_fatal_exception_causes_en.pdf
+  char buffer[500] = "";
+  struct rst_info* reset_info = system_get_rst_info();
+
+  if(reset_info->reason == REASON_EXCEPTION_RST) {
+    snprintf(buffer, 500, " cause %d, epc1=0x%08x, epc2=0x%08x, epc3=0x%08x, excvaddr=0x%08x, depc=0x%08x\n",
+	     reset_info->exccause, reset_info->epc1, reset_info->epc2, reset_info->epc3, reset_info->excvaddr, reset_info->depc);
+  }
+
    page.addHeading(String("ESP"));
-   page.addList(String("SDK ") + ESP.getSdkVersion(),
-		String("Core ") + ESP.getCoreVersion(),
+   page.addList(String("SDK ") + ESP.getSdkVersion() + String(" Core ") + ESP.getCoreVersion(),
 		String("VCC ") + ESP.getVcc(),
 		String("Free heap ") + ESP.getFreeHeap(),
 		String("Chip ID ") + ESP.getChipId() ,
@@ -238,7 +258,9 @@ void handleESP() {
 		String("Flash chip size ") + ESP.getFlashChipSize(),
 		String("Flash chip speed ") + ESP.getFlashChipSpeed(),
 		String("Sketch Size ") + ESP.getSketchSize(),
-		String("Free Sketch Space ") + ESP.getFreeSketchSpace());
+		String("Free Sketch Space ") + ESP.getFreeSketchSpace(),
+		String("Reset reason ") + ESP.getResetReason() + buffer);
+
 
    server.send(200, "text/html", page.getHTML());
 }
