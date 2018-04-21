@@ -229,7 +229,9 @@ void handleStateJSON() {
 void handleESP() {
    BootstrapWebPage page = BootstrapWebPage(&ws);
    page.addHeading(String("ESP"));
-   page.addList(String("VCC ") + ESP.getVcc(),
+   page.addList(String("SDK ") + ESP.getSdkVersion(),
+		String("Core ") + ESP.getCoreVersion(),
+		String("VCC ") + ESP.getVcc(),
 		String("Free heap ") + ESP.getFreeHeap(),
 		String("Chip ID ") + ESP.getChipId() ,
 		String("Flash chip ID ") + ESP.getFlashChipId(),
