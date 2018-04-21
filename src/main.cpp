@@ -4,6 +4,10 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
 
+#ifdef OTA_UPDATES
+#include <ArduinoOTA.h>
+#endif
+
 #ifdef MDNS_NAME
 #include <ESP8266mDNS.h>
 #endif
@@ -84,7 +88,8 @@ void setup() {
 #ifdef MDNS_NAME
   if (MDNS.begin(MDNS_NAME)) {
 #if DEBUG
-    Serial.println("MDNS responder started");
+    Serial.print("MDNS responder started: ");
+    Serial.println(MDNS_NAME);
 #endif
   }
 #endif
@@ -114,12 +119,16 @@ void setup() {
 #endif
 
 #ifdef OTA_UPDATES
-  httpUpdater.setup(&server);
+  ArduinoOTA.begin();
 #endif /* OTA_UPDATES */
 }
 
 void loop() {
   server.handleClient();
+
+#ifdef OTA_UPDATES
+  ArduinoOTA.handle();
+#endif
 }
 
 void fireplaceOn() {

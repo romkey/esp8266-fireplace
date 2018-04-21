@@ -4,7 +4,7 @@ This is a simple controller for a gas fireplace with a low voltage DC wall switc
 
 The controller uses a [Wemos D1 mini Lite](https://wiki.wemos.cc/products:d1:d1_mini_lite) with a [Wemos Relay Shield](https://wiki.wemos.cc/products:d1_mini_shields:relay_shield). The Relay Shield is wired in parallel with the wall switch so that either can turn on the fireplace. Note that this means if one is on, the other switch cannot turn it off.
 
-![Fireplace controller web UI](/doc/images/web-ui.png?raw=true)
+![Fireplace controller web UI](/doc/images/web-ui.png?raw=true =100px)
 
 ## Software
 
